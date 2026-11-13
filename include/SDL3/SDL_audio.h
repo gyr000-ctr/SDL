@@ -2291,6 +2291,47 @@ extern SDL_DECLSPEC bool SDLCALL SDL_SetAudioPostmixCallback(SDL_AudioDeviceID d
 extern SDL_DECLSPEC bool SDLCALL SDL_LoadWAV_IO(SDL_IOStream *src, bool closeio, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
 
 /**
+ * Loads the audio data of a WAVE file into memory, reporting 64-bit sizes.
+ *
+ * This function is identical to SDL_LoadWAV_IO(), except that the length of
+ * the audio data buffer is reported as a 64-bit value. It is needed for audio
+ * data that is larger than 4 GiB, which can occur in RF64, BW64 and Sony
+ * Wave64 containers.
+ *
+ * The supported containers are RIFF WAVE, RF64, BW64 and Sony Wave64. All
+ * encodings supported by SDL_LoadWAV_IO() are supported in each container.
+ *
+ * \param src the data source for the WAVE data.
+ * \param closeio if true, calls SDL_CloseIO() on `src` before returning, even
+ *                in the case of an error.
+ * \param spec a pointer to an SDL_AudioSpec that will be set to the WAVE
+ *             data's format details on successful return.
+ * \param audio_buf a pointer filled with the audio data, allocated by the
+ *                  function.
+ * \param audio_len a pointer filled with the length of the audio data buffer
+ *                  in bytes.
+ * \returns true on success. `audio_buf` will be filled with a pointer to an
+ *          allocated buffer containing the audio data, and `audio_len` is
+ *          filled with the length of that audio buffer in bytes.
+ *
+ *          This function returns false if the .WAV file cannot be opened,
+ *          uses an unknown data format, or is corrupt; call SDL_GetError()
+ *          for more information.
+ *
+ *          When the application is done with the data returned in
+ *          `audio_buf`, it should call SDL_free() to dispose of it.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL 3.5.0.
+ *
+ * \sa SDL_free
+ * \sa SDL_LoadWAV_IO
+ * \sa SDL_LoadWAV64
+ */
+extern SDL_DECLSPEC bool SDLCALL SDL_LoadWAV_IO64(SDL_IOStream *src, bool closeio, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint64 *audio_len);
+
+/**
  * Loads a WAV from a file path.
  *
  * This is a convenience function that is effectively the same as:
@@ -2325,6 +2366,46 @@ extern SDL_DECLSPEC bool SDLCALL SDL_LoadWAV_IO(SDL_IOStream *src, bool closeio,
  * \sa SDL_LoadWAV_IO
  */
 extern SDL_DECLSPEC bool SDLCALL SDL_LoadWAV(const char *path, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
+
+/**
+ * Loads a WAV from a file path, reporting 64-bit sizes.
+ *
+ * This is a convenience function that is effectively the same as:
+ *
+ * ```c
+ * SDL_LoadWAV_IO64(SDL_IOFromFile(path, "rb"), true, spec, audio_buf, audio_len);
+ * ```
+ *
+ * It can load audio data larger than 4 GiB from RF64, BW64 and Sony Wave64
+ * files.
+ *
+ * \param path the file path of the WAVE file to open.
+ * \param spec a pointer to an SDL_AudioSpec that will be set to the WAVE
+ *             data's format details on successful return.
+ * \param audio_buf a pointer filled with the audio data, allocated by the
+ *                  function.
+ * \param audio_len a pointer filled with the length of the audio data buffer
+ *                  in bytes.
+ * \returns true on success. `audio_buf` will be filled with a pointer to an
+ *          allocated buffer containing the audio data, and `audio_len` is
+ *          filled with the length of that audio buffer in bytes.
+ *
+ *          This function returns false if the .WAV file cannot be opened,
+ *          uses an unknown data format, or is corrupt; call SDL_GetError()
+ *          for more information.
+ *
+ *          When the application is done with the data returned in
+ *          `audio_buf`, it should call SDL_free() to dispose of it.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL 3.5.0.
+ *
+ * \sa SDL_free
+ * \sa SDL_LoadWAV
+ * \sa SDL_LoadWAV_IO64
+ */
+extern SDL_DECLSPEC bool SDLCALL SDL_LoadWAV64(const char *path, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint64 *audio_len);
 
 /**
  * Mix audio data in a specified format.

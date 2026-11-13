@@ -24,6 +24,7 @@ static SDLTest_TestSuiteRunner *runner;
 /* All test suites */
 static SDLTest_TestSuiteReference *testSuites[] = {
     &audioTestSuite,
+    &wavTestSuite,
     &clipboardTestSuite,
     &eventsTestSuite,
     &guidTestSuite,

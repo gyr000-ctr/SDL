@@ -27,11 +27,14 @@
 /*******************************************/
 // FOURCC
 #define RIFF 0x46464952 // "RIFF"
+#define RF64 0x34364652 // "RF64"
+#define BW64 0x34365742 // "BW64"
 #define WAVE 0x45564157 // "WAVE"
 #define FACT 0x74636166 // "fact"
 #define LIST 0x5453494c // "LIST"
 #define BEXT 0x74786562 // "bext"
 #define JUNK 0x4B4E554A // "JUNK"
+#define DS64 0x34367364 // "ds64"
 #define FMT  0x20746D66 // "fmt "
 #define DATA 0x61746164 // "data"
 // Format tags
@@ -88,18 +91,34 @@ typedef struct WaveFact
      * because a compressed block is usually decoded to a fixed number of
      * sample frames.
      */
-    Uint32 samplelength; // Raw sample length value from the fact chunk.
+    Uint64 samplelength; // Raw sample length value from the fact chunk or the RF64/BW64 ds64 chunk.
 } WaveFact;
 
 // Generic struct for the chunks in the WAVE file.
 typedef struct WaveChunk
 {
     Uint32 fourcc;   // FOURCC of the chunk.
-    Uint32 length;   // Size of the chunk data.
+    Uint64 length;   // Size of the chunk data.
     Sint64 position; // Position of the data in the stream.
     Uint8 *data;     // When allocated, this points to the chunk data. length is used for the memory allocation size.
     size_t size;     // Number of bytes in data that could be read from the stream. Can be smaller than length.
 } WaveChunk;
+
+// Container format of the stream.
+typedef enum WaveContainer
+{
+    CONTAINER_RIFF, // RIFF WAVE, including RF64 and BW64 files.
+    CONTAINER_WAVE64 // Sony Wave64 with GUID chunks.
+} WaveContainer;
+
+// 64-bit sizes from the RF64/BW64 ds64 chunk.
+typedef struct WaveDS64
+{
+    bool available;
+    Uint64 rifflength;
+    Uint64 datalength;
+    Uint64 samplelength;
+} WaveDS64;
 
 // Controls how the size of the RIFF chunk affects the loading of a WAVE file.
 typedef enum WaveRiffSizeHint
@@ -144,6 +163,9 @@ typedef struct WaveFile
     Sint64 sampleframes;
 
     void *decoderdata; // Some decoders require extra data for a state.
+
+    WaveContainer container;
+    WaveDS64 ds64;
 
     WaveRiffSizeHint riffhint;
     WaveTruncationHint trunchint;

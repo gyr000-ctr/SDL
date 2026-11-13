@@ -13,6 +13,7 @@
 
 /* Test collections */
 extern SDLTest_TestSuiteReference audioTestSuite;
+extern SDLTest_TestSuiteReference wavTestSuite;
 extern SDLTest_TestSuiteReference clipboardTestSuite;
 extern SDLTest_TestSuiteReference eventsTestSuite;
 extern SDLTest_TestSuiteReference guidTestSuite;

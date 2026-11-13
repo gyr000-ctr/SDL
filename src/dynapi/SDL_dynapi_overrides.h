@@ -1348,3 +1348,5 @@
 #define SDL_SetRenderHDRHeadroom SDL_SetRenderHDRHeadroom_REAL
 #define SDL_GetRenderHDRHeadroom SDL_GetRenderHDRHeadroom_REAL
 #define SDL_GetCurrentThreadName SDL_GetCurrentThreadName_REAL
+#define SDL_LoadWAV64 SDL_LoadWAV64_REAL
+#define SDL_LoadWAV_IO64 SDL_LoadWAV_IO64_REAL
